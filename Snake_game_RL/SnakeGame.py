@@ -1,70 +1,80 @@
-import pygame, random
-from enum import Enum
-from collections import namedtuple
+import pygame, sys, random
+from pygame.math import Vector2
 
 pygame.init()
 
-BLOCK_SIZE = 20
-Point = namedtuple('Point', ('x', 'y'))
-# Allows accessing elements of a tuple by name rather than index. Makes code readable
-
-class Direction(Enum):
-    # prevents errors when entering direction
-    RIGHT = 1
-    LEFT = 2
-    UP = 3
-    DOWN = 4
-
-class SnakeGame():
-
-    def __init__(self, width = 640, height = 480):
-        self.w = width
-        self.h = height
-        
-        self.display = pygame.display.set_mode((self.w, self.h))
-        pygame.display.set_caption('Snake Game')
-        # Create the screen of specified dimensions and give it a title
-
-        self.clock = pygame.time.Clock()
-        # Game clock to control speed
-
-        self.direction = Direction.RIGHT
-        # Initializes starting direction of snake
-
-        self.head = Point(self.w/2, self.h/2)
-        # Holds the initial position of snake head
-
-        self.snake = [self.head, Point(self.head.x - BLOCK_SIZE, self.head.y), Point(self.head.x-(2 * BLOCK_SIZE),self.head.y)]
-
-        self.score = 0
-        self.food = None
-        self.place_food()
-
-
-
-
+## Fruit class
+class FRUIT():
     
+    def __init__(self):
+        self.x = random.randint(0,cell_number - 1)
+        self.y = random.randint(0,cell_number - 1)
+        self.pos = Vector2(self.x, self.y)
+
+    def draw_fruit(self):
+        fruit_rect = pygame.Rect(int(self.pos.x) * cell_size, int(self.pos.y) * cell_size, cell_size, cell_size)
+        pygame.draw.rect(screen, (126,166,114), fruit_rect)
 
 
+# Snake class
+class SNAKE():
+
+    def __init__(self):
+        self.body = [Vector2(7,10), Vector2(8,10), Vector2(9,10)]
+        self.direction = Vector2(1,0)
+
+    def draw_snake(self):
+        for block in self.body :
+            body_rect = pygame.Rect(int(block.x) * cell_size, int(block.y) * cell_size, cell_size, cell_size)
+            pygame.draw.rect(screen, (0,0,255), body_rect)
+
+    def move_snake(self):
+        body_copy = self.body[:-1] # All cells except last one
+        body_copy.insert(0,body_copy[0] + self.direction) # Moves head one cell in direction specified
+        self.body = body_copy # Draws rest of body as it is
 
 
-    def place_food(self):
-        x = random.randint(0, (self.w - BLOCK_SIZE)//BLOCK_SIZE) * BLOCK_SIZE
-        y = random.randint(0, (self.h - BLOCK_SIZE)//BLOCK_SIZE) * BLOCK_SIZE
+# Screen init
+cell_size = 40
+cell_number = 20
+screen = pygame.display.set_mode((cell_number * cell_size, cell_number * cell_size))
 
+# Clock to regulate framerate
+clock = pygame.time.Clock()
 
-    def play_step(self):
-        pass
+fruit = FRUIT()
+snake = SNAKE()
 
+SCREEN_UPDATE = pygame.USEREVENT # Custom userevent
+pygame.time.set_timer(SCREEN_UPDATE,150) # triggers given event every 150ms
 
+# Main game loop
+while True :
+    for event in pygame.event.get():
 
-if __name__ == '__main__':
+        if event.type == pygame.QUIT:
+            pygame.quit()
+            sys.exit()
 
-    game = SnakeGame()
+        if event.type == SCREEN_UPDATE :
+            snake.move_snake()
 
-    while True :
-         game.play_step()
+        # Checking if key has been pressed and which key
+        if event.type == pygame.KEYDOWN :
 
+            if event.key == pygame.K_UP :
+                snake.direction = Vector2(0,-1)
+            if event.key == pygame.K_DOWN :
+                snake.direction = Vector2(0,1)
+            if event.key == pygame.K_RIGHT :
+                snake.direction = Vector2(1,0)
+            if event.key == pygame.K_LEFT :
+                snake.direction = Vector2(-1,0)
 
+    screen.fill((175,215,70))
 
-    pygame.quit()
+    fruit.draw_fruit()
+    snake.draw_snake()
+
+    pygame.display.update()
+    clock.tick(60)

@@ -3,6 +3,12 @@ from pygame.math import Vector2
 
 pygame.init()
 
+def rect_with_border(border, xpos, ypos, cellsize, color_inside, color_border):
+    rect1 = pygame.Rect(xpos * cellsize, ypos * cellsize, cellsize, cellsize)
+    rect2 = pygame.Rect(xpos * (cellsize - border/2), ypos * (cellsize- border/2), cellsize - border, cellsize - border)
+    pygame.draw.rect(screen, color_border, rect1)
+    pygame.draw.rect(screen, color_inside, rect2)
+
 ## Fruit class
 class FRUIT():
     
@@ -10,8 +16,7 @@ class FRUIT():
         self.randomize()
 
     def draw_fruit(self):
-        fruit_rect = pygame.Rect(int(self.pos.x) * cell_size, int(self.pos.y) * cell_size, cell_size, cell_size)
-        pygame.draw.rect(screen, (126,166,114), fruit_rect)
+        rect_with_border(2, int(self.pos.x), int(self.pos.y), cell_size, (255,166,114), (126,166,114))
 
     def randomize(self):
         self.x = random.randint(0,cell_number - 1)

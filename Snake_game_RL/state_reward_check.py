@@ -179,4 +179,4 @@ def env_step() :
 done = False
 while not done :
     reward, done = env_step()
-    print('Reward : ')
+    print('Reward : ', reward)

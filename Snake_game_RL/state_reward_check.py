@@ -59,8 +59,11 @@ class MAIN():
     def __init__(self):
         self.snake = SNAKE()
         self.fruit = FRUIT()
+        self.reward = 0
+        self.done = False
 
     def update(self):
+        self.reward = 0
         self.snake.move_snake()
         self.check_collision()
         self.check_fail()
@@ -73,6 +76,7 @@ class MAIN():
 
     def check_collision(self):
         if self.fruit.pos == self.snake.body[0]:
+            self.reward = 10
             self.fruit.randomize()
             self.snake.add_block()
 
@@ -85,8 +89,8 @@ class MAIN():
                 self.game_over()
 
     def game_over(self):
-        pygame.quit()
-        sys.exit()
+        self.reward = -10
+        self.done = True
 
     def draw_grass(self):
         grass_color = (167,209,61)
@@ -169,5 +173,10 @@ def env_step() :
     pygame.display.update()
     clock.tick(60)
 
-while True :
-    env_step()
+    return main_game.reward, main_game.done
+
+
+done = False
+while not done :
+    reward, done = env_step()
+    print('Reward : ')

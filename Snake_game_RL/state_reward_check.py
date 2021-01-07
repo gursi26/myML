@@ -4,6 +4,7 @@ Normal snake game in python, takes user input.
 
 import pygame, sys, random
 from pygame.math import Vector2
+import numpy as np
 
 pygame.init()
 
@@ -61,6 +62,7 @@ class MAIN():
         self.fruit = FRUIT()
         self.reward = 0
         self.done = False
+        self.danger_direction = np.array([0,0,0])
 
     def update(self):
         self.reward = 0
@@ -167,16 +169,28 @@ def env_step() :
                     main_game.snake.direction = Vector2(-1,0)
 
     screen.fill((175,215,70))
-
     main_game.draw_elements()
+
+    head = main_game.snake.body[0]
+    if head.x == 0 :
+        pass
+    elif head.x == 19 : 
+        pass
+    elif head.y == 0 :
+        pass
+    elif head.y == 19 :
+        pass
+
+    else :
+        main_game.danger_direction = np.array([0,0,0])
 
     pygame.display.update()
     clock.tick(60)
 
-    return main_game.reward, main_game.done
+    return main_game.reward, main_game.danger_direction, main_game.done
 
 
 done = False
 while not done :
-    reward, done = env_step()
-    print('Reward : ', reward)
+    reward, state, done = env_step()
+    print('State : ', state)

@@ -141,6 +141,48 @@ pygame.time.set_timer(SCREEN_UPDATE,150) # triggers given event every 150ms
 
 main_game = MAIN()
 
+def danger_direction_check():
+
+    head = main_game.snake.body[0]
+    direction = main_game.snake.direction
+    danger = main_game.danger_direction
+
+    danger = np.array([0,0,0])
+
+    if head.x == 0 :
+        if direction.x == -1 :
+            danger[1] = 1 
+        elif direction.y == -1 :
+            danger[0] = 1
+        elif direction.y == 1 :
+            danger[2] = 1
+
+    elif head.x == 19 : 
+        if direction.x == 1 :
+            danger[1] = 1
+        elif direction.y == -1 :
+            danger[2] = 1
+        elif direction.y == 1 :
+            danger[0] = 1
+
+    if head.y == 0 :
+        if direction.x == -1 :
+            danger[2] = 1
+        elif direction.x == 1 :
+            danger[0] = 1
+        elif direction.y == -1 :
+            danger[1] = 1
+
+    elif head.y == 19 :
+        if direction.x == -1 :
+            danger[0] = 1
+        elif direction.x == 1 :
+            danger[2] = 1
+        elif direction.y == 1 :
+            danger[1] = 1
+
+    return danger
+
 # Main game loop
 def env_step() :
     for event in pygame.event.get():
@@ -171,18 +213,7 @@ def env_step() :
     screen.fill((175,215,70))
     main_game.draw_elements()
 
-    head = main_game.snake.body[0]
-    if head.x == 0 :
-        pass
-    elif head.x == 19 : 
-        pass
-    elif head.y == 0 :
-        pass
-    elif head.y == 19 :
-        pass
-
-    else :
-        main_game.danger_direction = np.array([0,0,0])
+    main_game.danger_direction = danger_direction_check()
 
     pygame.display.update()
     clock.tick(60)

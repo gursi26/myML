@@ -1,3 +1,7 @@
+'''
+Normal snake game in python, takes user input.
+'''
+
 import pygame, sys, random
 from pygame.math import Vector2
 

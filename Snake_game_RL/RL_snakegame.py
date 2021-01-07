@@ -1,3 +1,9 @@
+''' 
+This script has a function at the end called env_step(action) which can be called in another python script for
+reinforcement learning. The function returns state values and a reward and takes in an action (up,down,left,right)
+as an argument.
+'''
+
 import pygame, sys, random
 from pygame.math import Vector2
 import numpy as np

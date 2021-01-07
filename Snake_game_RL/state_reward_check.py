@@ -1,5 +1,14 @@
 '''
-Normal snake game in python, takes user input.
+Normal snake game in python, takes user input. 
+
+States returned (11 boolean values) :
+    [up, right, down, left, danger_left, danger_forward, danger_right, food_up, food_right, food_down, food_left]
+
+Rewards :
+    0 for nothing
+    10 for getting food
+    -10 for dying
+
 '''
 
 import pygame, sys, random
@@ -62,7 +71,6 @@ class MAIN():
         self.fruit = FRUIT()
         self.reward = 0
         self.done = False
-        self.danger_direction = np.array([0,0,0])
 
     def update(self):
         self.reward = 0
@@ -142,11 +150,8 @@ pygame.time.set_timer(SCREEN_UPDATE,150) # triggers given event every 150ms
 main_game = MAIN()
 
 def danger_direction_check():
-
     head = main_game.snake.body[0]
     direction = main_game.snake.direction
-    danger = main_game.danger_direction
-
     danger = np.array([0,0,0])
 
     if head.x == 0 :
@@ -183,6 +188,20 @@ def danger_direction_check():
 
     return danger
 
+def current_direction_check():
+    current_direction = main_game.snake.direction
+
+    if current_direction.y == -1 :
+        direction = np.array([1,0,0,0])
+    elif current_direction.x == 1 :
+        direction = np.array([0,1,0,0])
+    elif current_direction.y == 1 :
+        direction = np.array([0,0,1,0])
+    elif current_direction.x == -1 :
+        direction = np.array([0,0,0,1])
+
+    return direction
+
 # Main game loop
 def env_step() :
     for event in pygame.event.get():
@@ -213,12 +232,15 @@ def env_step() :
     screen.fill((175,215,70))
     main_game.draw_elements()
 
-    main_game.danger_direction = danger_direction_check()
+    danger_direction = danger_direction_check()
+    current_direction = current_direction_check()
+
+    current_state = np.concatenate((danger_direction, current_direction))
 
     pygame.display.update()
     clock.tick(60)
 
-    return main_game.reward, main_game.danger_direction, main_game.done
+    return main_game.reward, current_state, main_game.done
 
 
 done = False

@@ -11,7 +11,7 @@ class FRUIT():
 
     def draw_fruit(self):
         fruit_rect = pygame.Rect(int(self.pos.x) * cell_size, int(self.pos.y) * cell_size, cell_size, cell_size)
-        pygame.draw.rect(screen, (126,166,114), fruit_rect)
+        pygame.draw.rect(screen, (255,51,51), fruit_rect)
 
     def randomize(self):
         self.x = random.randint(0,cell_number - 1)
@@ -30,7 +30,7 @@ class SNAKE():
     def draw_snake(self):
         for block in self.body :
             body_rect = pygame.Rect(int(block.x) * cell_size, int(block.y) * cell_size, cell_size, cell_size)
-            pygame.draw.rect(screen, (0,0,255), body_rect)
+            pygame.draw.rect(screen, (102,102,255), body_rect)
 
     def move_snake(self):
 

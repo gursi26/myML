@@ -1,5 +1,6 @@
 import pygame, sys, random
 from pygame.math import Vector2
+import numpy as np
 
 pygame.init()
 
@@ -80,7 +81,7 @@ class MAIN():
             if block == self.snake.body[0]:
                 self.game_over()
 
-    def game_over():
+    def game_over(self):
         pygame.quit()
         sys.exit()
 
@@ -132,7 +133,7 @@ pygame.time.set_timer(SCREEN_UPDATE,150) # triggers given event every 150ms
 main_game = MAIN()
 
 # Main game loop
-def env_step() :
+def env_step(action) :
     for event in pygame.event.get():
 
         if event.type == pygame.QUIT:
@@ -142,21 +143,24 @@ def env_step() :
         if event.type == SCREEN_UPDATE :
             main_game.update()
 
-        # Checking if key has been pressed and which key
-        if event.type == pygame.KEYDOWN :
+        # Takes an action as an argument for function
+        UP = 0
+        RIGHT = 1
+        DOWN = 2
+        LEFT = 3
 
-            if event.key == pygame.K_UP :
-                if main_game.snake.direction.y != 1 : 
-                    main_game.snake.direction = Vector2(0,-1)
-            if event.key == pygame.K_DOWN :
-                if main_game.snake.direction.y != -1 :
-                    main_game.snake.direction = Vector2(0,1)
-            if event.key == pygame.K_RIGHT :
-                if main_game.snake.direction.x != -1 :
-                    main_game.snake.direction = Vector2(1,0)
-            if event.key == pygame.K_LEFT :
-                if main_game.snake.direction.x != 1 :
-                    main_game.snake.direction = Vector2(-1,0)
+        if action.argmax() == UP :
+            if main_game.snake.direction.y != 1 : 
+                main_game.snake.direction = Vector2(0,-1)
+        if action.argmax() == DOWN :
+            if main_game.snake.direction.y != -1 :
+                main_game.snake.direction = Vector2(0,1)
+        if action.argmax() == RIGHT :
+            if main_game.snake.direction.x != -1 :
+                main_game.snake.direction = Vector2(1,0)
+        if action.argmax() == LEFT :
+            if main_game.snake.direction.x != 1 :
+                main_game.snake.direction = Vector2(-1,0)
 
     screen.fill((175,215,70))
 
@@ -164,6 +168,3 @@ def env_step() :
 
     pygame.display.update()
     clock.tick(60)
-
-while True :
-    env_step()

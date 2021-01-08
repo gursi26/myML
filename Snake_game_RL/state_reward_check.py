@@ -184,7 +184,6 @@ def danger_direction_check():
     return danger
 
 
-
 def current_direction_check():
     current_direction = main_game.snake.direction
 
@@ -198,6 +197,26 @@ def current_direction_check():
         direction = np.array([0,0,0,1])
 
     return direction
+
+
+def food_direction_check():
+
+    fruit_direction = np.array([0,0,0,0])
+    head = main_game.snake.body[0]
+    food_loc = main_game.fruit.pos
+
+    if food_loc.x > head.x :
+        fruit_direction[1] = 1
+    elif food_loc.x < head.x :
+        fruit_direction[3] = 1
+
+    if food_loc.y > head.y :
+        fruit_direction[2] = 1
+    elif food_loc.y < head.y : 
+        fruit_direction[0] = 1
+
+    return fruit_direction
+
 
 # Main game loop
 def env_step(render = True) :
@@ -234,8 +253,9 @@ def env_step(render = True) :
 
     danger_direction = danger_direction_check()
     current_direction = current_direction_check()
+    fruit_direction = food_direction_check()
 
-    current_state = np.concatenate((danger_direction, current_direction))
+    current_state = np.concatenate((danger_direction, current_direction, fruit_direction))
 
     pygame.display.update()
     

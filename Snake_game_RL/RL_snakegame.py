@@ -134,29 +134,6 @@ class MAIN():
         screen.blit(score_surface, score_rect)
 
 
-# Screen init
-cell_size = 40
-cell_number = 20
-valid_cells = []
-
-for var1 in range(cell_number):
-    for var2 in range(cell_number):
-        valid_cells.append(Vector2(var1,var2))
-
-
-screen = pygame.display.set_mode((cell_number * cell_size, cell_number * cell_size))
-
-# font
-game_font = pygame.font.Font(None, 40)
-
-# Clock to regulate framerate
-clock = pygame.time.Clock()
-
-SCREEN_UPDATE = pygame.USEREVENT # Custom userevent
-pygame.time.set_timer(SCREEN_UPDATE,150) # triggers given event every 150ms
-
-main_game = MAIN()
-
 def danger_direction_check():
 
     danger = np.array([0,0,0])
@@ -219,19 +196,45 @@ def food_direction_check():
 
     return fruit_direction
 
+# Screen init
+cell_size = 40
+cell_number = 20
+valid_cells = []
+
+for var1 in range(cell_number):
+    for var2 in range(cell_number):
+        valid_cells.append(Vector2(var1,var2))
+
+screen = pygame.display.set_mode((cell_number * cell_size, cell_number * cell_size))
+
+# font
+game_font = pygame.font.Font(None, 40)
+
+# Clock to regulate framerate
+clock = pygame.time.Clock()
+main_game = MAIN()
+
+def render_or_not(render = True):
+
+    SCREEN_UPDATE = pygame.USEREVENT # Custom userevent
+    if render : 
+        pygame.time.set_timer(SCREEN_UPDATE,150) # triggers given event every 150ms
+    else :
+        pygame.time.set_timer(SCREEN_UPDATE, 10)
+
+    return SCREEN_UPDATE
+
 
 # Main game loop
-def env_step(action, render = True) :
+def env_step(action, game_update_speed, render = True) :
+
     for event in pygame.event.get():
 
         if event.type == pygame.QUIT:
             pygame.quit()
             sys.exit()
 
-        if render : 
-            if event.type == SCREEN_UPDATE :
-                main_game.update()
-        else :
+        if event.type == game_update_speed :
             main_game.update()
 
         # Takes an action as an argument for function
@@ -240,16 +243,16 @@ def env_step(action, render = True) :
         DOWN = 2
         LEFT = 3
 
-        if action.argmax() == UP :
+        if action == UP :
             if main_game.snake.direction.y != 1 : 
                 main_game.snake.direction = Vector2(0,-1)
-        if action.argmax() == DOWN :
+        if action == DOWN :
             if main_game.snake.direction.y != -1 :
                 main_game.snake.direction = Vector2(0,1)
-        if action.argmax() == RIGHT :
+        if action == RIGHT :
             if main_game.snake.direction.x != -1 :
                 main_game.snake.direction = Vector2(1,0)
-        if action.argmax() == LEFT :
+        if action == LEFT :
             if main_game.snake.direction.x != 1 :
                 main_game.snake.direction = Vector2(-1,0)
 

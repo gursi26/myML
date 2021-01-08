@@ -1,7 +1,12 @@
 import numpy as np
 import RL_Snakegame as env
 
+render = True
+game_updater = env.render_or_not(render = render)
+
 done = False
+
 while not done : 
-    reward, state, done = env.env_step(np.array([1,0,0,0]), render=False)
+    action = np.random.randint(0,3)
+    reward, state, done = env.env_step(action = action, render = render, game_update_speed = game_updater)
     print(reward, state)

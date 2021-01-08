@@ -10,7 +10,6 @@ Rewards :
     -10 for dying
 
 '''
-
 import pygame, sys, random
 from pygame.math import Vector2
 import numpy as np
@@ -136,6 +135,13 @@ class MAIN():
 # Screen init
 cell_size = 40
 cell_number = 20
+valid_cells = []
+
+for var1 in range(cell_number):
+    for var2 in range(cell_number):
+        valid_cells.append(Vector2(var1,var2))
+
+
 screen = pygame.display.set_mode((cell_number * cell_size, cell_number * cell_size))
 
 # font
@@ -150,43 +156,33 @@ pygame.time.set_timer(SCREEN_UPDATE,150) # triggers given event every 150ms
 main_game = MAIN()
 
 def danger_direction_check():
-    head = main_game.snake.body[0]
-    direction = main_game.snake.direction
+
     danger = np.array([0,0,0])
 
-    if head.x == 0 :
-        if direction.x == -1 :
-            danger[1] = 1 
-        elif direction.y == -1 :
-            danger[0] = 1
-        elif direction.y == 1 :
-            danger[2] = 1
+    head = main_game.snake.body[0]
+    direction = main_game.snake.direction
 
-    elif head.x == 19 : 
-        if direction.x == 1 :
-            danger[1] = 1
-        elif direction.y == -1 :
-            danger[2] = 1
-        elif direction.y == 1 :
-            danger[0] = 1
+    if direction == Vector2(0,-1):
+        possible_directions = [Vector2(-1,0), Vector2(0,-1), Vector2(1,0)]
+    elif direction == Vector2(1,0):
+        possible_directions = [Vector2(0,-1), Vector2(1,0), Vector2(0,1)]
+    elif direction == Vector2(0,1):
+        possible_directions = [Vector2(1,0), Vector2(0,1), Vector2(-1,0)]
+    elif direction == Vector2(-1,0):
+        possible_directions = [Vector2(0,1), Vector2(-1,0), Vector2(0,-1)]
 
-    if head.y == 0 :
-        if direction.x == -1 :
-            danger[2] = 1
-        elif direction.x == 1 :
-            danger[0] = 1
-        elif direction.y == -1 :
-            danger[1] = 1
+    adj_blocks = []
+    for i in possible_directions :
+        adj_blocks.append(head + i)
 
-    elif head.y == 19 :
-        if direction.x == -1 :
-            danger[0] = 1
-        elif direction.x == 1 :
-            danger[2] = 1
-        elif direction.y == 1 :
-            danger[1] = 1
+    for i2 in range(len(adj_blocks)):
+        if adj_blocks[i2] not in valid_cells :
+            danger[i2] = 1
+        if adj_blocks[i2] in main_game.snake.body :
+            danger[i2] = 1
 
     return danger
+
 
 def current_direction_check():
     current_direction = main_game.snake.direction
@@ -202,15 +198,38 @@ def current_direction_check():
 
     return direction
 
+
+def food_direction_check():
+
+    fruit_direction = np.array([0,0,0,0])
+    head = main_game.snake.body[0]
+    food_loc = main_game.fruit.pos
+
+    if food_loc.x > head.x :
+        fruit_direction[1] = 1
+    elif food_loc.x < head.x :
+        fruit_direction[3] = 1
+
+    if food_loc.y > head.y :
+        fruit_direction[2] = 1
+    elif food_loc.y < head.y : 
+        fruit_direction[0] = 1
+
+    return fruit_direction
+
+
 # Main game loop
-def env_step() :
+def env_step(render = True) :
     for event in pygame.event.get():
 
         if event.type == pygame.QUIT:
             pygame.quit()
             sys.exit()
 
-        if event.type == SCREEN_UPDATE :
+        if render : 
+            if event.type == SCREEN_UPDATE :
+                main_game.update()
+        else :
             main_game.update()
 
         # Checking if key has been pressed and which key
@@ -234,11 +253,14 @@ def env_step() :
 
     danger_direction = danger_direction_check()
     current_direction = current_direction_check()
+    fruit_direction = food_direction_check()
 
-    current_state = np.concatenate((danger_direction, current_direction))
+    current_state = np.concatenate((danger_direction, current_direction, fruit_direction))
 
     pygame.display.update()
-    clock.tick(60)
+    
+    if render : 
+        clock.tick(60)
 
     return main_game.reward, current_state, main_game.done
 

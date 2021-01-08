@@ -1,9 +1,17 @@
-''' 
-This script has a function at the end called env_step(action) which can be called in another python script for
-reinforcement learning. The function returns state values and a reward and takes in an action (up,down,left,right)
-as an argument.
 '''
+Normal snake game in python. 
 
+States returned (11 boolean values) :
+    [up, right, down, left, danger_left, danger_forward, danger_right, food_up, food_right, food_down, food_left]
+
+Rewards :
+    0 for nothing
+    10 for getting food
+    -10 for dying
+
+return order : reward, state, done
+
+'''
 import pygame, sys, random
 from pygame.math import Vector2
 import numpy as np
@@ -95,7 +103,6 @@ class MAIN():
         self.reward = -10
         self.done = True
 
-
     def draw_grass(self):
         grass_color = (167,209,61)
 
@@ -130,6 +137,13 @@ class MAIN():
 # Screen init
 cell_size = 40
 cell_number = 20
+valid_cells = []
+
+for var1 in range(cell_number):
+    for var2 in range(cell_number):
+        valid_cells.append(Vector2(var1,var2))
+
+
 screen = pygame.display.set_mode((cell_number * cell_size, cell_number * cell_size))
 
 # font
@@ -143,15 +157,81 @@ pygame.time.set_timer(SCREEN_UPDATE,150) # triggers given event every 150ms
 
 main_game = MAIN()
 
+def danger_direction_check():
+
+    danger = np.array([0,0,0])
+
+    head = main_game.snake.body[0]
+    direction = main_game.snake.direction
+
+    if direction == Vector2(0,-1):
+        possible_directions = [Vector2(-1,0), Vector2(0,-1), Vector2(1,0)]
+    elif direction == Vector2(1,0):
+        possible_directions = [Vector2(0,-1), Vector2(1,0), Vector2(0,1)]
+    elif direction == Vector2(0,1):
+        possible_directions = [Vector2(1,0), Vector2(0,1), Vector2(-1,0)]
+    elif direction == Vector2(-1,0):
+        possible_directions = [Vector2(0,1), Vector2(-1,0), Vector2(0,-1)]
+
+    adj_blocks = []
+    for i in possible_directions :
+        adj_blocks.append(head + i)
+
+    for i2 in range(len(adj_blocks)):
+        if adj_blocks[i2] not in valid_cells :
+            danger[i2] = 1
+        if adj_blocks[i2] in main_game.snake.body :
+            danger[i2] = 1
+
+    return danger
+
+
+def current_direction_check():
+    current_direction = main_game.snake.direction
+
+    if current_direction.y == -1 :
+        direction = np.array([1,0,0,0])
+    elif current_direction.x == 1 :
+        direction = np.array([0,1,0,0])
+    elif current_direction.y == 1 :
+        direction = np.array([0,0,1,0])
+    elif current_direction.x == -1 :
+        direction = np.array([0,0,0,1])
+
+    return direction
+
+
+def food_direction_check():
+
+    fruit_direction = np.array([0,0,0,0])
+    head = main_game.snake.body[0]
+    food_loc = main_game.fruit.pos
+
+    if food_loc.x > head.x :
+        fruit_direction[1] = 1
+    elif food_loc.x < head.x :
+        fruit_direction[3] = 1
+
+    if food_loc.y > head.y :
+        fruit_direction[2] = 1
+    elif food_loc.y < head.y : 
+        fruit_direction[0] = 1
+
+    return fruit_direction
+
+
 # Main game loop
-def env_step(action) :
+def env_step(action, render = True) :
     for event in pygame.event.get():
 
         if event.type == pygame.QUIT:
             pygame.quit()
             sys.exit()
 
-        if event.type == SCREEN_UPDATE :
+        if render : 
+            if event.type == SCREEN_UPDATE :
+                main_game.update()
+        else :
             main_game.update()
 
         # Takes an action as an argument for function
@@ -174,10 +254,17 @@ def env_step(action) :
                 main_game.snake.direction = Vector2(-1,0)
 
     screen.fill((175,215,70))
-
     main_game.draw_elements()
 
-    pygame.display.update()
-    clock.tick(60)
+    danger_direction = danger_direction_check()
+    current_direction = current_direction_check()
+    fruit_direction = food_direction_check()
 
-    return main_game.reward, main_game.done
+    current_state = np.concatenate((danger_direction, current_direction, fruit_direction))
+
+    pygame.display.update()
+    
+    if render : 
+        clock.tick(60)
+
+    return main_game.reward, current_state, main_game.done

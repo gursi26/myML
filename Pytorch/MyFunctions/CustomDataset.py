@@ -1,17 +1,16 @@
 from torch.utils.data import Dataset
-from keras.preprocessing.image import load_image, img_to_array
+from keras.preprocessing.image import load_img, img_to_array
 import os
 
 '''
 Dataset class that loads in images. use with torch.utils.data.DataLoader for loading images
 
-data_object = Data(img_folder, target_size = (128,128), transform = None)
+data_object = Data(img_folder, target_size = (128,128))
 
 data_object[index] returns image and label at that index. Use labelmap to convert label to string.
 
 - img_folder as a pathname string
 - target_size as a tuple with two elements
-- Use tranforms from torchvision.transforms
 
 self.labelmap for labelmap
 self.len for len
@@ -20,9 +19,9 @@ self.classes for classes
 
 
 '''
-class Data(Dataset):
+class ImageLoader(Dataset):
 
-    def __init__(self, img_folder, target_size = (128,128), transform = None):
+    def __init__(self, img_folder, target_size = (128,128)):
         self.classes = os.listdir(img_folder)
 
         try : 
@@ -49,7 +48,6 @@ class Data(Dataset):
 
         self.len = len(self.img_names)
         self.target_size = target_size
-        self.transform = transform
         
         self.labelmap = {}
         for var1 in range(len(self.classes)) :
@@ -62,12 +60,10 @@ class Data(Dataset):
             if self.img_names[index] in temp_list :
                 break
 
-        image = img_to_array(load_img(os.path.join(self.class_path[i], self.img_names[index]), target_size = self.target_size))
+        image = img_to_array(load_img(os.path.join(self.class_path[i], self.img_names[index]), 
+                                      target_size = self.target_size))
         image = image/255.0
         label = i
-
-        if self.transform :
-            image = self.transform(image)
 
         return image,label
 

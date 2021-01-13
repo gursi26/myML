@@ -6,7 +6,7 @@ import numpy as np
 
 current_path = os.path.dirname(os.path.abspath(sys.argv[0]))
 
-mask_model = load_model(current_path + '/mask_models/mask_modelR3E15.h5')
+mask_model = load_model(current_path + '/mask_modelR3E15.h5')
 
 prototxtpath = current_path + '/facenet/deploy.prototxt'
 caffemodelpath = current_path + '/facenet/res10_300x300_ssd_iter_140000.caffemodel'

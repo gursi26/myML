@@ -1,6 +1,6 @@
 {
     "python.linting.enabled": true,
     "git.ignoreLimitWarning": true,
-    "python.pythonPath": "/Users/gursi/opt/anaconda3/envs/Kerasflow/bin/python",
+    "python.pythonPath": "/Users/gursi/opt/anaconda3/envs/Pytorch/bin/python",
     "jupyter.jupyterServerType": "local"
 }

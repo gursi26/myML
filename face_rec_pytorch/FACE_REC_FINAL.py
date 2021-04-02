@@ -57,9 +57,9 @@ model_path = input('Enter path of model. Leave empty for default model : ')
 print('-' * 50)
 
 if model_path == '':
-    model_path = current_path + '/facerec_model.pt'
+    model_path = '/Users/gursi/Desktop/ML/myML/face_rec_pytorch/facerec_model.pt'
 
-mask_model = torch.load('/Users/gursi/Desktop/myML/face_rec_pytorch/facerec_model.pt')
+mask_model = torch.load(model_path)
 mask_model.eval()
 
 prototxtpath = current_path + '/face_rec_models/deploy.prototxt'
